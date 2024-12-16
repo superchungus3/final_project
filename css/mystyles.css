@@ -1,0 +1,26 @@
+body{
+    font-family: 'Comic Sans MS';
+}
+.site-heading .site-heading-lower{
+    font-family: Arial, Helvetica, sans-serif;
+    font-size: 1.5em;
+}
+.mb-3{
+    font-family: 'Comic Sans MS';
+}
+a{
+    font-family: 'Comic Sans MS';
+}
+#mainNav{
+    background-color: rgb(52, 131, 52, 0.8);
+}
+.cta{
+    background-color: rgb(121, 92, 177, 0.2);
+}
+.btn-primary{
+    background-color: rgb(80, 125, 53);
+    border-color: rgb(80,125,53);
+}
+.bg-faded{
+    background-color: rgb(107, 152, 178);
+}

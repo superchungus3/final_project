@@ -1,0 +1,185 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Grid Game</title>
+    <style>
+        body {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+            background-color: #f0f0f0;
+        }
+        .game-container {
+            display: flex;
+            align-items: center;
+        }
+        #grid {
+            display: grid;
+            grid-template-columns: repeat(20, 30px);
+            grid-template-rows: repeat(20, 30px);
+            gap: 1px;
+        }
+        .cell {
+            width: 30px;
+            height: 30px;
+            background-color: green; /* All boxes green */
+            border: 1px solid #ccc;
+            position: relative;
+        }
+        .character::before {
+            content: '';
+            width: 20px;
+            height: 20px;
+            background-color: red; /* Character is a red dot */
+            border-radius: 50%;
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+        }
+        .visited {
+            background-color: #98fb98; /* Light green to mark visited cells */
+        }
+        .finish {
+            background-color: gold; /* Final box is gold */
+        }
+        button {
+            margin-left: 20px;
+            padding: 10px 20px;
+            font-size: 16px;
+            cursor: pointer;
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            border-radius: 5px;
+        }
+        button:hover {
+            background-color: #45a049;
+        }
+    </style>
+</head>
+<body>
+    <div class="game-container">
+        <div id="grid"></div>
+        <button id="playAgainBtn">Play Again</button>
+    </div>
+
+    <script>
+        const grid = document.getElementById('grid');
+        const gridSize = 20;
+
+        // Create the grid
+        for (let i = 0; i < gridSize * gridSize; i++) {
+            const cell = document.createElement('div');
+            cell.classList.add('cell');
+            grid.appendChild(cell);
+        }
+
+        const cells = document.querySelectorAll('.cell');
+
+        // Path (hidden from the player, no visual cues)
+        const path = [
+            [19, 0], [18, 0], [18, 1], [17, 1], [16, 1], 
+            [16, 2], [15, 2], [15, 3], [14, 3], [13, 3], [13, 4], [12, 4],
+            [11, 4], [10, 4], [10, 5], [9, 5], [8, 5], [8, 6], [7, 6],
+            [6, 6], [6, 7], [5, 7], [4, 7], [3, 7], [2, 7], [1, 7], 
+            [0, 7], [0, 8], [0, 9], [1, 9], [2, 9], [2, 10], [3, 10], [3, 11],
+            [4, 11], [5, 11], [6, 11], [7, 11], [7, 10], [8, 10], [9, 10],
+            [10, 10], [11, 10], [12, 10], [12, 9], [13, 9], [13, 8], [14, 8],
+            [15, 8], [16, 8], [16, 9], [16, 10], [17, 10], [18, 10], [18, 11],
+            [18, 12], [18, 13], [17, 13], [16, 13], [16, 14], [16, 15],
+            [15, 15], [14, 15], [14, 14], [14, 13], [13, 13], [12, 13], [12, 14],
+            [12, 15], [11, 15], [10, 15], [9, 15], [8, 15], [7, 15], [7, 16], [7, 17],
+            [6, 17], [5, 17], [5, 16], [4, 16], [4, 15], [4, 14], [3, 14], [2, 14],
+            [2, 15], [2, 16], [2, 17], [1, 17], [1, 18], [0, 18], [0, 19]
+             // This should now connect directly to the top-right box
+        ];
+
+        // Track visited cells
+        let visitedCells = new Set();
+
+        // Character position
+        let charRow = 19;
+        let charCol = 0;
+        const finishRow = 0;
+        const finishCol = gridSize - 1;
+
+        // Highlight the finish box
+        const finishIndex = finishRow * gridSize + finishCol;
+        cells[finishIndex].classList.add('finish');
+
+        updateCharacter();
+
+        // Listen for arrow key presses
+        document.addEventListener('keydown', (event) => {
+            let newRow = charRow;
+            let newCol = charCol;
+
+            if (event.key === 'ArrowUp') newRow--;
+            if (event.key === 'ArrowDown') newRow++;
+            if (event.key === 'ArrowLeft') newCol--;
+            if (event.key === 'ArrowRight') newCol++;
+
+            // Check bounds
+            if (newRow < 0 || newRow >= gridSize || newCol < 0 || newCol >= gridSize) {
+                return;
+            }
+
+            // Check if the move is valid
+            if (path.some(([row, col]) => row === newRow && col === newCol)) {
+                charRow = newRow;
+                charCol = newCol;
+                updateCharacter();
+
+                // Mark the cell as visited
+                const currentIndex = charRow * gridSize + charCol;
+                visitedCells.add(currentIndex);
+                cells[currentIndex].classList.add('visited');
+
+                // Check win condition
+                if (charRow === finishRow && charCol === finishCol) {
+                    alert('You win!');
+                }
+            } else {
+                // Reset to start, but keep visited cells
+                charRow = 19;
+                charCol = 0;
+                updateCharacter();
+                alert('Wrong move! Back to the start.');
+            }
+        });
+
+        function updateCharacter() {
+            cells.forEach(cell => cell.classList.remove('character'));
+            const index = charRow * gridSize + charCol;
+            cells[index].classList.add('character');
+        }
+
+        // Keep the visited cells highlighted even after the reset
+        visitedCells.forEach(index => {
+            cells[index].classList.add('visited');
+        });
+
+        // Play Again button functionality
+        document.getElementById('playAgainBtn').addEventListener('click', () => {
+            // Reset character position
+            charRow = 19;
+            charCol = 0;
+            updateCharacter();
+
+            // Reset visited cells (but keep the ones that are still part of the path)
+            visitedCells.clear();
+            cells.forEach(cell => {
+                cell.classList.remove('visited');
+            });
+
+            // Optionally, you can keep the finish box highlighted
+            cells[finishIndex].classList.add('finish');
+        });
+    </script>
+</body>
+</html>

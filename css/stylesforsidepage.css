@@ -1,0 +1,14 @@
+body{
+    background-color: rgb(51, 120, 120);
+}
+h5{
+    font-size: larger;
+}
+h1{
+    font-size: 3em;
+    color: rgb(94, 55, 32);
+}
+img{
+    padding: 10px;
+    display: inline-block;
+}
